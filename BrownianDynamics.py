@@ -126,7 +126,7 @@ def trajectory(args):
     interacting     = f.interacting(ligand, CONFIG)
     F, T_lig, T_rec = f.calcForceAndTorque(ligand, receptor, grid, CONFIG)
     
-    pqr.write_molecules_to_pqr(ligand, 'start'+str(i), CONFIG.LIGAND_PQRS[0], CONFIG)
+    pqr.write_molecules_to_pqr(ligand, 'start_{:06d}'.format(i), CONFIG.LIGAND_PQRS[0], CONFIG)
     
     # Propagation Loop --------------------------------------------------------
     collision_counter = 0

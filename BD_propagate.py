@@ -78,7 +78,7 @@ class Propagator(object):
             ligand_coord        = g.center(ligand.R, CONFIG.LIGAND_COORD_ATOMS) 
             receptor_coord      = g.center(receptor.R, CONFIG.RECEPTOR_COORD_ATOMS)
             reaction_coordinate = norm(ligand_coord - receptor_coord) 
-            print reaction_coordinate
+            #print reaction_coordinate
             if reaction_coordinate < CONFIG.COORD_THRESHOLD:
                 return 1
             else:
