@@ -47,6 +47,7 @@ class Configuration(object):
         self.NUMBER_TRAJECTORIES     = int(         config.get('simulation', 'number-of-trajectories') )
         self.NUMBER_THREADS          = int(         config.get('simulation', 'number-of-threads') )
         self.OUTPUT_DIRECTORY        =              config.get('simulation', 'output-directory')
+        self.SAVE_START_COORDS       = bool(        config.getboolean('simulation', 'save-start-coords') )
         
 def checkInputConsistency(ligand_prototype, receptor, grid, propagator, CONFIG):
     
