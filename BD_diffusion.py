@@ -17,7 +17,7 @@ def diffusion_trans(T, rgyr):
     """
     Returns the translational diffusion coefficient according to Stoke's law.
     """
-    return c.k_per_eta * T / 6e0 / math.pi /  rgyr
+    return c.k_per_eta * T / 6e0 / math.pi /  rgyr       # [A^2/ps]
 
 def diffusion_rot(T, rgyr):
     """

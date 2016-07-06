@@ -39,8 +39,19 @@ if os.path.exists(CONFIG.OUTPUT_DIRECTORY):
 else:
     os.mkdir(CONFIG.OUTPUT_DIRECTORY) 
 
+
+# load from pickle
+if (not CONFIG.LOAD_MOLS_FROM_PICKLE.lower() in ['false', 'no']) and \
+   (os.path.isfile(CONFIG.LOAD_MOLS_FROM_PICKLE)):
+    sys.stdout.write(' Loading ligand, receptor and grid from pickle...\n')
+    sys.stdout.flush()
+    pickle_file = open(CONFIG.LOAD_MOLS_FROM_PICKLE, 'r')
+    receptor, grid, ligand_prototypes = pickle.load(pickle_file)
+    pickle_file.close()
 # set up
-if CONFIG.LOAD_MOLS_FROM_PICKLE.lower() == 'false' or CONFIG.LOAD_MOLS_FROM_PICKLE.lower() == 'no':  
+else:
+    if not os.path.isfile(CONFIG.LOAD_MOLS_FROM_PICKLE):
+        sys.stdout.write(' No pickle file found...\n')
     sys.stdout.write(' Setting up receptor...\n')
     sys.stdout.flush()
     receptor            = m.Receptor(CONFIG)
@@ -56,18 +67,11 @@ if CONFIG.LOAD_MOLS_FROM_PICKLE.lower() == 'false' or CONFIG.LOAD_MOLS_FROM_PICK
     for ligand_pqr in CONFIG.LIGAND_PQRS:
         ligand_prototypes.append(m.Ligand(ligand_pqr, grid))
     
-    if not (CONFIG.SAVE_MOLS_TO_PICKLE.lower() == 'false' or CONFIG.SAVE_MOLS_TO_PICKLE.lower() == 'no'):  
+    if not (CONFIG.SAVE_MOLS_TO_PICKLE.lower() in ['false', 'no']):  
         pickle_file = open(CONFIG.SAVE_MOLS_TO_PICKLE, 'w')
         pickle.dump([receptor, grid, ligand_prototypes], pickle_file)
         pickle_file.close()
-        
-# load from pickle
-else:
-    sys.stdout.write(' Loading ligand, receptor and grid from pickle...\n')
-    sys.stdout.flush()
-    pickle_file = open(CONFIG.LOAD_MOLS_FROM_PICKLE, 'r')
-    receptor, grid, ligand_prototypes = pickle.load(pickle_file)
-    pickle_file.close()
+
 
 pqr.write_molecules_to_pqr(receptor, 'receptor_centered', CONFIG.RECEPTOR_PQR, CONFIG)    
 propagator = p.Propagator(ligand_prototypes[0], receptor, CONFIG)
