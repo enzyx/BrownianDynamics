@@ -69,7 +69,7 @@ else:
     
     if not (CONFIG.SAVE_MOLS_TO_PICKLE.lower() in ['false', 'no']):  
         pickle_file = open(CONFIG.SAVE_MOLS_TO_PICKLE, 'w')
-        pickle.dump([receptor, grid, ligand_prototypes], pickle_file)
+        pickle.dump([receptor, grid, ligand_prototypes], pickle_file, protocol=pickle.HIGHEST_PROTOCOL)
         pickle_file.close()
 
 

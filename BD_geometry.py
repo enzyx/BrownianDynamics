@@ -60,18 +60,19 @@ def rotate(molecule, dO, rotate_around_center = False):
         for d in range(3):
             molecule.center[d] = R_matrix[d,0]   
 
-def center(R, indices = 0):
+def center(R, indices = -1):
     """
     returns the geometric center of all atom positions in R
     if a indices list is given, returns the geometric center of 
     the atoms corresponding to the indices
     """
     center = numpy.zeros([3])
-    if indices == 0 or indices == [0]:
+    if indices == -1 or indices == [-1]:
         for index in range(len(R)):
             center += R[index]
         return center / len(R)
     else:
+        print indices
         for index in indices:
             center += R[index]
         return center / len(indices)        

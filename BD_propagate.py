@@ -75,14 +75,29 @@ class Propagator(object):
         if ligand_radius > CONFIG.MAXIMUM_RADIUS:
             return 0
         else:
-            ligand_coord        = g.center(ligand.R, CONFIG.LIGAND_COORD_ATOMS) 
-            receptor_coord      = g.center(receptor.R, CONFIG.RECEPTOR_COORD_ATOMS)
-            reaction_coordinate = norm(ligand_coord - receptor_coord) 
+            reaction_coordinate = self.getReactionCoordinate(ligand, receptor, CONFIG)
             #print reaction_coordinate
             if reaction_coordinate < CONFIG.COORD_THRESHOLD:
                 return 1
             else:
                 return 2
+    
+    def getReactionCoordinate(self, ligand, receptor, CONFIG):
+        # atom pair distance rmsd
+        if CONFIG.REACTION_COORD_TYPE == 'drmsd':
+            drmsd   = 0.0
+            N_pairs = len(CONFIG.LIGAND_COORD_ATOMS)
+            for i in range(N_pairs):
+                drmsd += norm(ligand.R[CONFIG.LIGAND_COORD_ATOMS[i]] - \
+                              receptor.R[CONFIG.RECEPTOR_COORD_ATOMS[i]])**2
+            return (drmsd/N_pairs)**0.5
+        # com is default
+        else:
+            ligand_coord        = g.center(ligand.R, CONFIG.LIGAND_COORD_ATOMS) 
+            receptor_coord      = g.center(receptor.R, CONFIG.RECEPTOR_COORD_ATOMS)
+            return norm(ligand_coord - receptor_coord)
+        
+
             
     def starting_position(self, ligand, CONFIG, ran):
         

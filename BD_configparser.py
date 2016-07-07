@@ -4,6 +4,7 @@ import sys
 import datetime
 import BD_constants as c
 import math
+from BD_colors import Colors as colors
 
 class Configuration(object):
     """
@@ -37,6 +38,7 @@ class Configuration(object):
         self.LIGAND_COORD_ATOMS      = map(int,     config.get('reaction-distance', 'ligand-atoms').split() )
         self.RECEPTOR_COORD_ATOMS    = map(int,     config.get('reaction-distance', 'receptor-atoms').split() )
         self.COORD_THRESHOLD         = float(       config.get('reaction-distance', 'threshold') )
+        self.REACTION_COORD_TYPE     =              config.get('reaction-distance', 'coordinate-type').lower() # possible are: com, drmsd
         
         # SIMULATION PARAMETERS
         self.RANDOM_START_POSITIONS  = bool(        config.getboolean('simulation', 'random-start-positions') )
@@ -48,22 +50,25 @@ class Configuration(object):
         self.NUMBER_THREADS          = int(         config.get('simulation', 'number-of-threads') )
         self.OUTPUT_DIRECTORY        =              config.get('simulation', 'output-directory')
         self.SAVE_START_COORDS       = bool(        config.getboolean('simulation', 'save-start-coords') )
-        
+                
 def checkInputConsistency(ligand_prototype, receptor, grid, propagator, CONFIG):
     
     if ligand_prototype.rmax + receptor.rmax > CONFIG.INTERACTION_RADIUS:
-        print 'WARNING: ligand radius {} + receptor radius {} > interaction radius {}'.format(
-                    ligand_prototype.rmax, receptor.rmax, CONFIG.INTERACTION_RADIUS)
+        print '{ws}WARNING:{we} ligand radius {rl} + receptor radius {rr} > interaction radius {ri}'.format(
+                    rl=ligand_prototype.rmax, rr=receptor.rmax, ri=CONFIG.INTERACTION_RADIUS, ws=colors.WARNING, we=colors.ENDC)
         sys.exit()
     if CONFIG.COLLISION_RADIUS < CONFIG.GRID_SPACING:
-        print 'WARNING: collision radius < grid resolution'
+        print '{ws}WARNING:{we} collision radius < grid resolution'.format(ws=colors.WARNING, we=colors.ENDC)
+        sys.exit()
+    if CONFIG.REACTION_COORD_TYPE == 'drmsd' and len(CONFIG.LIGAND_COORD_ATOMS) != len(CONFIG.RECEPTOR_COORD_ATOMS):
+        print '{ws}WARNING:{we} number of ligand and receptor atoms need to be equal'.format(ws=colors.WARNING, we=colors.ENDC)
+        print '         for drmsd interaction type'
         sys.exit()
         
 def printSimulationInfo(ligand_prototype, receptor, grid, propagator, CONFIG):
     
     M_ligand = 22*13*1.6e-27
     
-
     for output in [sys.stdout, open(CONFIG.OUTPUT_DIRECTORY+'/BD.info','w')]:
         output.write(' Info:\n')
         output.write('  - start time:                {}\n'.format(datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')))
@@ -77,6 +82,11 @@ def printSimulationInfo(ligand_prototype, receptor, grid, propagator, CONFIG):
         output.write('      number of atoms:         {:d}\n'.format(receptor.N_atoms))
         output.write('      radius of gyration:      {:3.2f}\n'.format(receptor.rgyr))
         output.write('      sigma rotation    :      {:3.2f}\n'.format(propagator.sigma_rot_receptor))
+        output.write('  - Interaction:\n')
+        output.write('      reaction coordinate:     {}\n'.format(CONFIG.REACTION_COORD_TYPE))
+        output.write('      atoms ligand:            {}\n'.format(CONFIG.LIGAND_COORD_ATOMS))
+        output.write('      atoms receptor:          {}\n'.format(CONFIG.RECEPTOR_COORD_ATOMS))
+        output.write('      reaction threshold:      {:3.2f}\n'.format(CONFIG.COORD_THRESHOLD))
         output.write('  - Grid:\n')    
         output.write('      grid spacing:            {:3.2f}\n'.format(grid.grid_spacing))    
         output.write('      grid shape:              {}\n'.format(grid.shape))
@@ -90,8 +100,7 @@ def printSimulationInfo(ligand_prototype, receptor, grid, propagator, CONFIG):
         output.write('      electrostatics:          {}\n'.format(CONFIG.INCLUDE_ELECTROSTATICS))
         output.write('      interaction radius:      {:3.2f}\n'.format(CONFIG.INTERACTION_RADIUS))
         output.write('      dt:                      {:3.2f}\n'.format(CONFIG.DT))    
-        output.write('      dt-beyond-i.a.-radius:   {:3.2f}\n'.format(CONFIG.DT_BEYOND_INTERA_RADIUS))   
-        output.write('      reaction threshold:      {:3.2f}\n'.format(CONFIG.COORD_THRESHOLD))  
+        output.write('      dt-beyond-i.a.-radius:   {:3.2f}\n'.format(CONFIG.DT_BEYOND_INTERA_RADIUS))     
         output.write('      mD/kT/dt !<< 1           {:3.2e}\n'.format(M_ligand / c.eta / 6e0 / math.pi /  ligand_prototype.rgyr/ CONFIG.DT *1.e10*1.e12))
         output.flush()
         
