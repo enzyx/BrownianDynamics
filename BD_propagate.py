@@ -70,7 +70,6 @@ class Propagator(object):
     
     
     def state(self, ligand, receptor, CONFIG):
-        
         ligand_radius           = norm(ligand.center)
         if ligand_radius > CONFIG.MAXIMUM_RADIUS:
             return 0
@@ -88,8 +87,9 @@ class Propagator(object):
             drmsd   = 0.0
             N_pairs = len(CONFIG.LIGAND_COORD_ATOMS)
             for i in range(N_pairs):
-                drmsd += norm(ligand.R[CONFIG.LIGAND_COORD_ATOMS[i]] - \
-                              receptor.R[CONFIG.RECEPTOR_COORD_ATOMS[i]])**2
+                drmsd += ( norm(ligand.R[CONFIG.LIGAND_COORD_ATOMS[i]] - \
+                                receptor.R[CONFIG.RECEPTOR_COORD_ATOMS[i]]) \
+                           - CONFIG.REFERENCE_DISTANCES[i] )**2
             return (drmsd/N_pairs)**0.5
         # com is default
         else:

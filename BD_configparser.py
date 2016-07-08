@@ -1,6 +1,6 @@
 import ConfigParser
 from numpy.linalg import norm
-import sys
+import sys,os
 import datetime
 import BD_constants as c
 import math
@@ -11,6 +11,9 @@ class Configuration(object):
     contains the configuration parameterse
     """
     def __init__(self, CONFIGFILE):
+        if not os.path.isfile(CONFIGFILE):
+            print "{}Error:{} Could not open config file: {}".format(colors.FAIL, colors.ENDC, CONFIGFILE)
+            sys.exit(-1)
 
         config = ConfigParser.ConfigParser()
         config.read(CONFIGFILE)
@@ -39,6 +42,7 @@ class Configuration(object):
         self.RECEPTOR_COORD_ATOMS    = map(int,     config.get('reaction-distance', 'receptor-atoms').split() )
         self.COORD_THRESHOLD         = float(       config.get('reaction-distance', 'threshold') )
         self.REACTION_COORD_TYPE     =              config.get('reaction-distance', 'coordinate-type').lower() # possible are: com, drmsd
+        self.REFERENCE_DISTANCES     = map(float,   config.get('reaction-distance', 'reference-distances').split() )
         
         # SIMULATION PARAMETERS
         self.RANDOM_START_POSITIONS  = bool(        config.getboolean('simulation', 'random-start-positions') )
@@ -60,9 +64,9 @@ def checkInputConsistency(ligand_prototype, receptor, grid, propagator, CONFIG):
     if CONFIG.COLLISION_RADIUS < CONFIG.GRID_SPACING:
         print '{ws}WARNING:{we} collision radius < grid resolution'.format(ws=colors.WARNING, we=colors.ENDC)
         sys.exit()
-    if CONFIG.REACTION_COORD_TYPE == 'drmsd' and len(CONFIG.LIGAND_COORD_ATOMS) != len(CONFIG.RECEPTOR_COORD_ATOMS):
-        print '{ws}WARNING:{we} number of ligand and receptor atoms need to be equal'.format(ws=colors.WARNING, we=colors.ENDC)
-        print '         for drmsd interaction type'
+    if CONFIG.REACTION_COORD_TYPE == 'drmsd' and len(CONFIG.LIGAND_COORD_ATOMS) != len(CONFIG.RECEPTOR_COORD_ATOMS) != len(CONFIG.REFERENCE_DISTANCES):
+        print '{ws}WARNING:{we} number of ligand and receptor atoms and reference distances'.format(ws=colors.WARNING, we=colors.ENDC)
+        print '         need to be equal for drmsd interaction type'
         sys.exit()
         
 def printSimulationInfo(ligand_prototype, receptor, grid, propagator, CONFIG):

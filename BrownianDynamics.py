@@ -183,7 +183,7 @@ if CONFIG.NUMBER_THREADS == 1:
         # Monitor progress
         if i%10 == 0:
             progress_file = open(CONFIG.OUTPUT_DIRECTORY+'/progress', 'w')
-            progress_file.write('Trajectory:   {:7d}/{:7d}\n'.format(queue.qsize(), CONFIG.NUMBER_TRAJECTORIES))
+            progress_file.write('Trajectory:   {:7d}/{:7d}\n'.format(i, CONFIG.NUMBER_TRAJECTORIES))
             progress_file.close() 
                 
 # PARALLEL (THREADS)
