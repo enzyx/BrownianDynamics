@@ -4,7 +4,7 @@ import sys
 import argparse
 from multiprocessing import Pool, Manager
 import time
-import os, glob
+import os
 import cPickle as pickle
 import random
 import copy
@@ -64,9 +64,8 @@ else:
     sys.stdout.flush()
     
     ligand_prototypes = []
-    for ligand_pattern in CONFIG.LIGAND_PQRS:
-        for ligand_pqr in glob.glob(ligand_pattern):
-            ligand_prototypes.append(m.Ligand(ligand_pqr, grid))
+    for ligand_pqr in CONFIG.LIGAND_PQRS:
+        ligand_prototypes.append(m.Ligand(ligand_pqr, grid))
     
     if not (CONFIG.SAVE_MOLS_TO_PICKLE.lower() in ['false', 'no']):  
         pickle_file = open(CONFIG.SAVE_MOLS_TO_PICKLE, 'w')

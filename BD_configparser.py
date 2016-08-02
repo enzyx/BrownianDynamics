@@ -1,6 +1,6 @@
 import ConfigParser
 from numpy.linalg import norm
-import sys,os
+import sys,os,glob
 import datetime
 import BD_constants as c
 import math
@@ -23,7 +23,7 @@ class Configuration(object):
         self.MAXIMUM_RADIUS          = float(       config.get('system', 'maximum-radius') )
         self.T                       = float(       config.get('system', 'temperature') ) 
         self.COLLISION_RADIUS        = float(       config.get('system', 'collision-radius') )
-        self.LIGAND_PQRS             =              config.get('system', 'ligand.pqr-files').split()
+        self.LIGAND_PQRS             =              self.getLigandPqrs(config)
         self.RECEPTOR_PQR            =              config.get('system', 'receptor.pqr-file')
         self.POTENTIAL_FILE          =              config.get('system', 'potential.dx-file')
         
@@ -54,6 +54,13 @@ class Configuration(object):
         self.NUMBER_THREADS          = int(         config.get('simulation', 'number-of-threads') )
         self.OUTPUT_DIRECTORY        =              config.get('simulation', 'output-directory')
         self.SAVE_START_COORDS       = bool(        config.getboolean('simulation', 'save-start-coords') )
+
+    def getLigandPqrs(self, config):
+        ligand_pqrs = []
+        for ligand_pattern in config.get('system', 'ligand.pqr-files').split():
+            for ligand_pqr in glob.glob(ligand_pattern):
+                ligand_pqrs.append(ligand_pqr)
+        return ligand_pqrs
                 
 def checkInputConsistency(ligand_prototype, receptor, grid, propagator, CONFIG):
     
