@@ -94,7 +94,7 @@ def trajectory(args):
     
     if CONFIG.RANDOM_START_POSITIONS == True:
         # create an own copy of the propagated object for every trajectory run
-        ligand = copy.deepcopy(ligand_prototypes[0])
+        ligand = copy.deepcopy(ligand_prototypes[i%len(CONFIG.LIGAND_PQRS)])
         # move it to a random position on a sphere of radius STARTING_RADIUS
         # with random orientation and update grid indices
         propagator.starting_position(ligand, CONFIG, ran)
