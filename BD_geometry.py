@@ -72,7 +72,7 @@ def center(R, indices = -1):
             center += R[index]
         return center / len(R)
     else:
-        print indices
+        # print indices
         for index in indices:
             center += R[index]
         return center / len(indices)        
