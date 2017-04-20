@@ -28,9 +28,6 @@ class Configuration(object):
         self.POTENTIAL_FILE          =              config.get('system', 'potential.dx-file')
         
         # GRID 
-        self.POTENTIAL_GRID_ORIGIN   = map(float,   config.get('grid', 'potential-grid-origin').split() )
-        self.POTENTIAL_GRID_DELTA    = map(float,   config.get('grid', 'potential-grid-delta').split() )
-        self.POTENTIAL_GRID_SHAPE    = map(int,     config.get('grid', 'potential-grid-shape').split() )
         self.GRID_SPACING            = float(       config.get('grid', 'grid-spacing') )
         
         # PICKLE

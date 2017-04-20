@@ -76,11 +76,15 @@ class Grid(object):
     """
     def __init__(self, receptor, CONFIG):
         # LOAD POTENTIAL, COMPUTE GRADIENT
-        potential_flattened = numpy.loadtxt(CONFIG.POTENTIAL_FILE).flatten()
-        ps = numpy.array(CONFIG.POTENTIAL_GRID_SHAPE)
-        pd = numpy.array(CONFIG.POTENTIAL_GRID_DELTA)
-        po = numpy.array(CONFIG.POTENTIAL_GRID_ORIGIN) - numpy.array(receptor.center_original)
-        potential = numpy.zeros( CONFIG.POTENTIAL_GRID_SHAPE, float)
+        self.parseApbsPotentialFile(CONFIG)
+        potential_flattened = self.potential_flattened
+        # Save memory
+        del(self.potential_flattened)
+        
+        ps = self.ps # Grid shape
+        pd = self.pd # Grid delta
+        po = self.po # grid origin
+        potential = numpy.zeros( ps, float)
         
                
         index = numpy.zeros([3], int)
@@ -156,4 +160,32 @@ class Grid(object):
         
         
         sys.stdout.write('\n')
-        sys.stdout.flush()  
+        sys.stdout.flush()
+
+    def parseApbsPotentialFile(self, CONFIG):
+        f = open(CONFIG.POTENTIAL_FILE, 'r')
+        delta = []
+        potential = []
+        read_pot = False
+        count = 0
+        for line in f.readlines():
+            if "object 1 class gridpositions counts" in line:
+                self.ps = numpy.array(map(int, line.split()[-3:]))
+                n_gridpoints = self.ps[0] * self.ps[1] * self.ps[2]
+            if "origin" in line:
+                self.po = numpy.array(map(float, line.split()[-3:]))
+            if "delta" in line:
+                delta.append(map(float, line.split()[-3:]))
+            if read_pot:
+                if count >= n_gridpoints:
+                    read_pot = False
+                    continue
+                for potx in line.split():
+                    count += 1
+                    potential.append(float(potx))
+            if "object 3 class array type double rank" in line:
+                read_pot = True
+                
+        self.potential_flattened = numpy.array(potential)
+        self.pd = numpy.array(delta).diagonal()
+        f.close()
