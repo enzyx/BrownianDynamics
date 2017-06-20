@@ -1,11 +1,11 @@
 read
-    mol pqr dna_damaged_only.pqr
+    mol pqr receptor.pqr
 end
 elec
     mg-auto
-    dime 200 200 200
-    cglen 200 200 200
-    fglen 200 200 200
+    dime  193 193 193
+    cglen 193 193 193
+    fglen 193 193 193
     cgcent mol 1
     fgcent mol 1
     mol 1
@@ -20,11 +20,10 @@ elec
     sdens 10.00
     srad 1.40
     swin 0.30
-    temp 320.0
+    temp 298.0
     calcenergy total
     calcforce no 
     write pot dx pot
 
 end
 quit
-
